@@ -4,6 +4,12 @@
     <title>{{ event.event_name }}</title>
 </head>
 <body>
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
     <h1>{{ event.event_name }}</h1>
     
     <p><strong>Date:</strong> {{ event.event_date }}</p>
