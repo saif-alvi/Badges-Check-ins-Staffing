@@ -84,3 +84,10 @@ def host_eventpage(request):
     user_events = Event.objects.filter(host=request.user)
     return render(request, 'eventmanager/host_eventpage.html', {'events': user_events})
 
+@login_required(login_url='login')
+def delete_event(request, event_id):
+    if request.method == "POST":
+        Event.objects.filter(id=event_id, host=request.user).delete()
+        messages.success(request, 'Event Deleted!')
+    return redirect('host_eventpage')
+

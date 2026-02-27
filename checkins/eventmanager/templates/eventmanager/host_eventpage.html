@@ -26,6 +26,10 @@
                 <p>Capacity: {{ event.event_capacity }}</p>
                 <p>Description: {{ event.event_desc }}</p>
                 <hr>
+            <form method="POST" action="{% url 'event_delete' event.id %}">
+            {% csrf_token %}
+            <button type="submit">Delete Event</button>
+        </form>
             </div>
         {% endfor %}
     {% else %}
