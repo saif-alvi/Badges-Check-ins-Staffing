@@ -16,17 +16,13 @@ def login(request):
     if request.method == "POST":
         email = request.POST.get('email')
         password = request.POST.get('password')
-        host = request.POST.get('is_host')
         username = email
         if User.objects.filter(email=email).exists():
             user = authenticate(request, username = username, password = password)
             if user is not None:
                 auth_login(request,user)
+                return redirect('host_eventpage')
 
-                if host  == 'Y':
-                    return redirect('host_eventpage')
-                else:
-                    return redirect('event_search')
             else:
                 messages.error(request, "Email or Password is Incorrect")
                 return render(request, 'eventmanager/login.html')
@@ -93,5 +89,5 @@ def delete_event(request, event_id):
 
 def logout(request):
     auth_logout(request)
-    return redirect('login')
+    return redirect('index')
 
