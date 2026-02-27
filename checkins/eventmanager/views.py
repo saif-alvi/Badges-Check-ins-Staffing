@@ -9,6 +9,9 @@ from .models import Event
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import Event, Attendee
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Table, Paragraph, Spacer
 
 
 # Create your views here.
@@ -132,4 +135,39 @@ def delete_event(request, event_id):
 def logout(request):
     auth_logout(request)
     return redirect('index')
+
+
+@login_required(login_url='login')
+def event_attendee_pdf(request, attendee_id):
+    attendee = Attendee.objects.get(id=attendee_id, event__host=request.user)
+    event = attendee.event
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="' + event.event_name + '_attendee_' + str(attendee.id) + '.pdf"'
+
+    doc = SimpleDocTemplate(response, pagesize=letter)
+    elements = []
+
+    styles = getSampleStyleSheet()
+
+    title = Paragraph(event.event_name + " - Attendee Details", styles['Normal'])
+    elements.append(title)
+    elements.append(Spacer(1, 12))
+
+    attendee_info = Paragraph(
+        "<b>Email:</b> " +attendee.email + "<br/>" +
+        "<b>First Name:</b> "+attendee.first_name + "<br/>" +
+        "<b>Last Name:</b> "+attendee.last_name + "<br/>" +
+        "<b>Title:</b> "+attendee.title + "<br/>" +
+        "<b>Staff:</b> " + ("Yes" if attendee.attending_as_staff else "No") + "<br/>" +
+        "<b>Event Date:</b> " + event.event_date + "<br/>" +
+        "<b>Event Time:</b> " + event.start_time + " - " + event.end_time + "<br/>" +
+        "<b>Event Location:</b> " + event.venue_address,
+        styles['Normal']
+    )
+    elements.append(attendee_info)
+
+    doc.build(elements)
+
+    return response
 
