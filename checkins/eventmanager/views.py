@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.template import loader
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from .models import Event
 # Create your views here.
@@ -90,4 +90,8 @@ def delete_event(request, event_id):
         Event.objects.filter(id=event_id, host=request.user).delete()
         messages.success(request, 'Event Deleted!')
     return redirect('host_eventpage')
+
+def logout(request):
+    auth_logout(request)
+    return redirect('login')
 
