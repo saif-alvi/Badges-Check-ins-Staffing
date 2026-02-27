@@ -26,6 +26,23 @@
   </head>
   <body>
     <div class = "container">
+    <h1>Available Events</h1>
+    
+    {% if events %}
+        <ul>
+        {% for event in events %}
+            <li>
+
+                <p>Date: {{ event.event_date }}</p>
+                <p>Location: {{ event.venue_address }}</p>
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No events available.</p>
+    {% endif %}
+
+
     <h1>Event Management</h1>
     <p1 class="instructions">Are you a host for an event? Log in or sign up here. </p1>
     <div class="auth-buttons">

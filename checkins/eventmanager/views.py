@@ -9,10 +9,11 @@ from .models import Event
 # Create your views here.
 
 def index(request):
-    template = loader.get_template("eventmanager/index.html")
-    return render(request, "eventmanager/index.html")
+    all_events = Event.objects.all()
+    return render(request, 'eventmanager/index.html', {'events': all_events})
 
 def login(request):
+
     if request.method == "POST":
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -52,8 +53,6 @@ def signup(request):
     return render(request, 'eventmanager/signup.html')
 
 
-def event_search(request):
-    return HttpResponse("Welcome to the event management platform!")
 
 def event_signup_form(request):
     return HttpResponse("Welcome to the event management platform!")
