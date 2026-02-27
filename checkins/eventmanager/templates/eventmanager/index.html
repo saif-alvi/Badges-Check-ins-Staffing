@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <style>
+    
+    .container {  display: flex;
+    justify-content: center; 
+    align-items: center;
+    flex-direction: column;
+    margin: 10px;
+    padding: 20px;
+    font-size: 30px;
+    min-height: 100vh; 
+      
+  }
+
+  .instructions {
+       margin: 15px;
+    padding: 25px;
+  }
+
+    
+    </style>
+    <meta charset="utf-8" />
+    <title>Home Page</title>
+  </head>
+  <body>
+    <div class = "container">
+    <h1>Event Management</h1>
+    <p1 class="instructions">Hello, if you already have an account log in, otherwise sign up</p1>
+    <div class="auth-buttons">
+      <a href="{% url 'login' %}" class="btn btn-login">Login</a>
+      <a href="{% url 'signup' %}" class="btn btn-signup">Sign Up</a>
+    </div>
+    </div>
+  </body>
+</html>

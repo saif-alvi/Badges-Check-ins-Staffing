@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <style>
+    
+    .container {  display: flex;
+    justify-content: center; 
+    align-items: center;
+    flex-direction: column;
+    margin: 10px;
+    padding: 20px;
+    font-size: 30px;
+    min-height: 100vh; 
+      
+  }
+
+
+
+    
+    </style>
+    <meta charset="utf-8" />
+    <title>Log in</title>
+  </head>
+  <body>
+    <div class = "container">
+    <h1>Log in</h1>
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+      {% csrf_token %}
+        <label>Email:</label>
+        <input type="email" name="email" required><br>
+        
+        <label>Password:</label>
+        <input type="password" name="password" required><br>
+        
+        <label>Logging in as a Attendee or Host?</label><br>
+        <input type="radio" name="is_host" value="N" required> Attendee
+        <input type="radio" name="is_host" value="Y" required> Host<br>
+
+        <button type="submit">Log in</button>
+    
+    </form>
+    <div class = "container"></div>
+  </body>
+</html>
