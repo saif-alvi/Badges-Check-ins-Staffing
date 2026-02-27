@@ -4,6 +4,8 @@ from django.template import loader
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth.decorators import login_required
+from .models import Event
 # Create your views here.
 
 def index(request):
@@ -63,5 +65,22 @@ def event_signup_form(request):
 def event_confirmation(request):
     return HttpResponse("Welcome to the event management platform!")
 
+@login_required(login_url='login')
 def host_eventpage(request):
-    return HttpResponse("Welcome to the event management platform!")
+    if request.method == "POST":
+        Event.objects.create(
+            host = request.user,
+            event_name=request.POST.get('event_name'),
+            event_date=request.POST.get('event_date'),
+            start_time=request.POST.get('start_time'),
+            end_time=request.POST.get('end_time'),
+            event_type=request.POST.get('event_type'),
+            venue_address=request.POST.get('venue_address'),
+            event_desc=request.POST.get('event_desc'),
+            event_capacity=request.POST.get('event_capacity', 0)
+        )
+        messages.success(request, 'Event Created!')
+        return redirect('host_eventpage')
+    user_events = Event.objects.filter(host=request.user)
+    return render(request, 'eventmanager/host_eventpage.html', {'events': user_events})
+

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Host Dashboard</title>
+</head>
+<body>
+    <h1>Host Dashboard</h1>
+    <p>Welcome, {{ request.user.email }}</p>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    
+    <h2>Your Events</h2>
+    
+    {% if events %}
+        {% for event in events %}
+            <div>
+                <h3>{{ event.event_name }}</h3>
+                <p>Date: {{ event.event_date }}</p>
+                <p>Time: {{ event.start_time }} - {{ event.end_time }}</p>
+                <p>Location: {{ event.venue_address }}</p>
+                <p>Type: {{ event.event_type }}</p>
+                <p>Capacity: {{ event.event_capacity }}</p>
+                <p>Description: {{ event.event_desc }}</p>
+                <hr>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No events created yet.</p>
+    {% endif %}
+    
+    <h2>Create Event</h2>
+    <form method="POST">
+        {% csrf_token %}
+        
+        <label>Event Name:</label>
+        <input type="text" name="event_name" required><br>
+        
+        <label>Event Date:</label>
+        <input type="date" name="event_date" required><br>
+        
+        <label>Start Time:</label>
+        <input type="time" name="start_time" required><br>
+        
+        <label>End Time:</label>
+        <input type="time" name="end_time" required><br>
+        
+        <label>Event Type:</label>
+        <input type="text" name="event_type" required><br>
+        
+        <label>Venue Address:</label>
+        <input type="text" name="venue_address" required><br>
+        
+        <label>Description:</label>
+        <textarea name="event_desc" required></textarea><br>
+        
+        <label>Capacity:</label>
+        <input type="number" name="event_capacity" required><br>
+        
+        <button type="submit">Create Event</button>
+    </form>
+</body>
+</html>

@@ -1,8 +1,11 @@
 from django.db import models
+from django.contrib.auth.models import User
+
+
 
 # Create your models here.
 class Event(models.Model):
-    host_name = models.CharField(max_length=200)
+    host = models.ForeignKey(User, on_delete=models.CASCADE, related_name= 'events')
     event_name = models.CharField(max_length=200)
     event_date = models.CharField(max_length=200)
     start_time = models.CharField(max_length=200)
@@ -20,7 +23,7 @@ class Event(models.Model):
         return self.event_name
 
 class Attendee(models.Model):
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='attendees')
     email = models.EmailField(max_length=254, unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
