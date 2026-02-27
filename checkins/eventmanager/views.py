@@ -54,7 +54,7 @@ def signup(request):
 
 
 
-def event_signup_form(request):
+def event_signup_form(request, event_id):
     event = Event.objects.get(id=event_id)
     return render(request, 'eventmanager/event_signup_form.html', {'event': event})
 

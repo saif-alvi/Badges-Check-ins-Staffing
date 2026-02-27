@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ event.event_name }}</title>
+</head>
+<body>
+    <h1>{{ event.event_name }}</h1>
+    
+    <p><strong>Date:</strong> {{ event.event_date }}</p>
+    <p><strong>Time:</strong> {{ event.start_time }} - {{ event.end_time }}</p>
+    <p><strong>Location:</strong> {{ event.venue_address }}</p>
+    <p><strong>Type:</strong> {{ event.event_type }}</p>
+    <p><strong>Capacity:</strong> {{ event.event_capacity }}</p>
+    <p><strong>Description:</strong> {{ event.event_desc }}</p>
+    
+    <h2>Sign Up</h2>
+    <form method="POST" action="{% url 'event_signup_form' event.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="event_id" value="{{ event.id }}">
+        
+        <label>Email:</label>
+        <input type="email" name="email" required><br>
+        
+        <label>First Name:</label>
+        <input type="text" name="first_name" required><br>
+        
+        <label>Last Name:</label>
+        <input type="text" name="last_name" required><br>
+        
+        <label>Title:</label>
+        <input type="text" name="title" required><br>
+        
+        <label>Attending as Staff?</label>
+        <input type="checkbox" name="attending_as_staff"><br>
+        
+        <button type="submit">Sign Up</button>
+    </form>
+    
+    <a href="{% url 'index' %}">Back to Events</a>
+</body>
+</html>
