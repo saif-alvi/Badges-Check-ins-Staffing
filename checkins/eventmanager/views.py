@@ -55,7 +55,8 @@ def signup(request):
 
 
 def event_signup_form(request):
-    return HttpResponse("Welcome to the event management platform!")
+    event = Event.objects.get(id=event_id)
+    return render(request, 'eventmanager/event_signup_form.html', {'event': event})
 
 def event_confirmation(request):
     return HttpResponse("Welcome to the event management platform!")
