@@ -6,27 +6,32 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from .models import Event
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import Event, Attendee
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Table, Paragraph, Spacer
+
+
 # Create your views here.
 
 def index(request):
-    template = loader.get_template("eventmanager/index.html")
-    return render(request, "eventmanager/index.html")
+    all_events = Event.objects.all()
+    return render(request, 'eventmanager/index.html', {'events': all_events})
 
 def login(request):
+
     if request.method == "POST":
         email = request.POST.get('email')
         password = request.POST.get('password')
-        host = request.POST.get('is_host')
         username = email
         if User.objects.filter(email=email).exists():
             user = authenticate(request, username = username, password = password)
             if user is not None:
                 auth_login(request,user)
+                return redirect('host_eventpage')
 
-                if host  == 'Y':
-                    return redirect('host_eventpage')
-                else:
-                    return redirect('event_search')
             else:
                 messages.error(request, "Email or Password is Incorrect")
                 return render(request, 'eventmanager/login.html')
@@ -56,14 +61,50 @@ def signup(request):
     return render(request, 'eventmanager/signup.html')
 
 
-def event_search(request):
-    return HttpResponse("Welcome to the event management platform!")
 
-def event_signup_form(request):
-    return HttpResponse("Welcome to the event management platform!")
+def event_signup_form(request, event_id):
+    event = Event.objects.get(id=event_id)
+    if request.method == "POST":
+        email = request.POST.get('email')
+        first = request.POST.get('first_name')
+        last = request.POST.get('last_name')
+        title = request.POST.get('title')
+        staff =request.POST.get('staff')
+        if staff == None:
+            staff = False
+        else:
+            staff = True
 
-def event_confirmation(request):
-    return HttpResponse("Welcome to the event management platform!")
+        if Attendee.objects.filter(email=email).exists():
+            messages.error(request, 'Email already exists')
+            return render(request, 'eventmanager/event_signup_form.html', {'event': event})
+        else:
+
+            subject = "You're confirmed for "+ event.event_name
+            message = (
+                "Hi " + first + ",\n\n"
+                "You're confirmed for " + event.event_name + ".\n"
+                "Date: " + event.event_date + "\n"
+                "Time: " + event.start_time + " - " + event.end_time + "\n"
+                "Location: " + event.venue_address + "\n\n"
+                "Thanks for signing up!"
+            )
+
+            send_mail(subject,message,settings.DEFAULT_FROM_EMAIL,[email],fail_silently=False)
+            messages.success(request, 'Check your inbox for confirmation!')
+            Attendee.objects.create(
+                    event=event,
+                    email=email,
+                    first_name=first,
+                    last_name=last,
+                    title=title,
+                    attending_as_staff=staff
+                )
+            return redirect('index')
+   
+    return render(request, 'eventmanager/event_signup_form.html', {'event': event})
+
+
 
 @login_required(login_url='login')
 def host_eventpage(request):
@@ -93,5 +134,40 @@ def delete_event(request, event_id):
 
 def logout(request):
     auth_logout(request)
-    return redirect('login')
+    return redirect('index')
+
+
+@login_required(login_url='login')
+def event_attendee_pdf(request, attendee_id):
+    attendee = Attendee.objects.get(id=attendee_id, event__host=request.user)
+    event = attendee.event
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="' + event.event_name + '_attendee_' + str(attendee.id) + '.pdf"'
+
+    doc = SimpleDocTemplate(response, pagesize=letter)
+    elements = []
+
+    styles = getSampleStyleSheet()
+
+    title = Paragraph(event.event_name + " - Attendee Details", styles['Normal'])
+    elements.append(title)
+    elements.append(Spacer(1, 12))
+
+    attendee_info = Paragraph(
+        "<b>Email:</b> " +attendee.email + "<br/>" +
+        "<b>First Name:</b> "+attendee.first_name + "<br/>" +
+        "<b>Last Name:</b> "+attendee.last_name + "<br/>" +
+        "<b>Title:</b> "+attendee.title + "<br/>" +
+        "<b>Staff:</b> " + ("Yes" if attendee.attending_as_staff else "No") + "<br/>" +
+        "<b>Event Date:</b> " + event.event_date + "<br/>" +
+        "<b>Event Time:</b> " + event.start_time + " - " + event.end_time + "<br/>" +
+        "<b>Event Location:</b> " + event.venue_address,
+        styles['Normal']
+    )
+    elements.append(attendee_info)
+
+    doc.build(elements)
+
+    return response
 

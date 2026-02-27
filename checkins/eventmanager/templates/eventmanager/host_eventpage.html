@@ -25,11 +25,46 @@
                 <p>Type: {{ event.event_type }}</p>
                 <p>Capacity: {{ event.event_capacity }}</p>
                 <p>Description: {{ event.event_desc }}</p>
+                
+                <h4>Attendees ({{ event.attendees.count }})</h4>
+                {% if event.attendees.all %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Title</th>
+                                <th>Staff</th>
+                                <th>PDF</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for attendee in event.attendees.all %}
+                            <tr>
+                                <td>{{ attendee.email }}</td>
+                                <td>{{ attendee.first_name }}</td>
+                                <td>{{ attendee.last_name }}</td>
+                                <td>{{ attendee.title }}</td>
+                                <td>{% if attendee.attending_as_staff %}Yes{% else %}No{% endif %}</td>
+                                <td>
+                                    <a href="{% url 'event_attendee_pdf' attendee.id %}">
+                                        <button>PDF</button>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No attendees yet.</p>
+                {% endif %}
+                
                 <hr>
-            <form method="POST" action="{% url 'event_delete' event.id %}">
-            {% csrf_token %}
-            <button type="submit">Delete Event</button>
-        </form>
+                <form method="POST" action="{% url 'event_delete' event.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Delete Event</button>
+                </form>
             </div>
         {% endfor %}
     {% else %}
